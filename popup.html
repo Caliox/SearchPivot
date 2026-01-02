@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SearchPivot</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header>
+    <div class="top-bar">
+      <div class="logo-area">
+        <img src="icons/icon48.png" alt="Logo" class="logo-img">
+        <h1>SearchPivot</h1>
+      </div>
+      <button id="btn-settings" class="icon-btn" aria-label="设置">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z">
+          </path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      </button>
+    </div>
+
+    <div class="search-container">
+      <div class="search-icon-wrapper">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </div>
+      <input type="text" id="search-input" placeholder="输入搜索内容..." autocomplete="off" autofocus>
+      <div id="enter-hint" class="enter-hint hidden">回车搜索</div>
+    </div>
+
+    <div class="header-fade"></div>
+  </header>
+
+  <!-- MAIN CONTENT (Grid) -->
+  <main id="view-home" class="view active">
+    <!-- Search Engines Section -->
+    <div class="section-header">搜索引擎</div>
+    <div id="engines-grid" class="engine-grid"></div>
+
+    <!-- Search Sites Section -->
+    <div class="section-header mt-4">搜索站点</div>
+    <div id="sites-grid" class="engine-grid"></div>
+  </main>
+
+  <!-- SETTINGS VIEW -->
+  <main id="view-settings" class="view hidden">
+    <div class="settings-header">
+      <button id="btn-back" class="icon-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+      </button>
+      <h2>设置</h2>
+    </div>
+
+    <div class="settings-content">
+      <!-- Add Engine -->
+      <div class="section-title">添加 / 编辑引擎</div>
+      <div class="card form-card">
+        <input type="hidden" id="edit-mode-id" value="">
+        <div class="input-group">
+          <label>名称</label>
+          <input type="text" id="new-engine-name" placeholder="例如：知乎">
+        </div>
+        <div class="input-group">
+          <label>搜索 URL (%s 代替关键词)</label>
+          <input type="text" id="new-engine-url" placeholder="https://site.com/search?q=%s">
+        </div>
+        <div class="input-group">
+          <label>图标 (URL 或 上传图片)</label>
+          <div class="icon-upload-row">
+            <input type="text" id="new-engine-icon" placeholder="https://... 或点击上传">
+            <input type="file" id="file-upload" accept="image/*" class="hidden">
+            <button id="btn-upload-trigger" class="btn-secondary" title="上传本地图标">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>类型</label>
+          <select id="new-engine-type" class="form-select">
+            <option value="engine">搜索引擎</option>
+            <option value="site">搜索站点</option>
+          </select>
+        </div>
+        <div id="add-error" class="error-msg hidden"></div>
+
+        <div class="form-actions">
+          <button id="btn-cancel-edit" class="btn-secondary hidden" style="flex: 1;">取消</button>
+          <button id="btn-add-engine" class="btn-primary" style="flex: 2;">
+            <span id="btn-add-text">添加引擎</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- List -->
+      <div class="section-title mt-large">我的引擎列表</div>
+      <div id="custom-engine-list" class="custom-list">
+        <!-- All engines injected via JS -->
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="segmented-control" id="behavior-control">
+      <button data-value="CURRENT_TAB" class="segment">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+        当前页
+      </button>
+      <button data-value="NEW_TAB" class="segment active">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+        新标签
+      </button>
+      <button data-value="NEW_WINDOW" class="segment">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        新窗口
+      </button>
+      <button data-value="INCOGNITO" class="segment">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+          </path>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        </svg>
+        无痕
+      </button>
+    </div>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
